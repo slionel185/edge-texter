@@ -1,14 +1,16 @@
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 
-import { DispatchFormType, DispatchFormSchema } from '@/types/DispatchForm'
+import { DispatchFormType } from '@/types/DispatchForm'
 
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
 import { Form, FormField, FormItem } from '@/components/ui/form'
 import { Select, SelectItem, SelectContent, SelectGroup, SelectTrigger } from '@/components/ui/select'
+import { SelectValue } from '@radix-ui/react-select'
 
 export default function Dispatch() {
-    const form = useForm<DispatchFormType>({ resolver: zodResolver(DispatchFormSchema) })
+    const form = useForm<DispatchFormType>()
 
     function onSubmit(values: DispatchFormType) {
         window.electron.ipcRenderer.invoke('dispatch', [{ ...values }])
@@ -17,12 +19,14 @@ export default function Dispatch() {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
-                <div className='flex w-full flex-col md:flex-row gap-4'>
+                <div className='flex w-full flex-col gap-4'>
                     <FormField control={form.control} name='bucket' render={({ field }) => (
                         <FormItem className='w-full'>
-                            <Select {...field}>
+                            <Select {...field} onValueChange={field.onChange} defaultValue={field.value}>
                                 <SelectGroup>
-                                    <SelectTrigger>Bucket</SelectTrigger>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder='Select a bucket' />
+                                    </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value='WEB_LEAD'>Web Lead</SelectItem>
                                         <SelectItem value='VIP_GIEST'>VIP Guest</SelectItem>
@@ -41,9 +45,11 @@ export default function Dispatch() {
 
                     <FormField control={form.control} name='sortBy' render={({ field }) => (
                         <FormItem className='w-full flex items-center gap-3'>
-                            <Select {...field}>
+                            <Select {...field} onValueChange={field.onChange} defaultValue={field.value}>
                                 <SelectGroup className='w-full'>
-                                    <SelectTrigger>Sort By</SelectTrigger>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder='Sort By' />
+                                    </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value='DEFAULT'>Default</SelectItem>
                                         <SelectItem value='CREATED_ASCENDING'>Created Date Asc.</SelectItem>
@@ -66,6 +72,13 @@ export default function Dispatch() {
                             </FormItem>
                         )} />
                     </div>
+                    <FormField control={form.control} name='text' render={({ field }) => (
+                        <FormItem className='w-full flex items-center'>
+                            <Textarea className='resize-none' placeholder='Text to send...' {...field} />
+                        </FormItem>
+                    )} />
+
+                    <Button type='submit' className='w-full mt-2'>Start</Button>
                 </div>
             </form>
         </Form>

@@ -6,9 +6,15 @@ import icon from '../../resources/icon.png?asset'
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 500,
+    height: 760,
     show: false,
+    resizable: false,
+    maximizable: false,
+    maxHeight: 760,
+    minHeight: 760,
+    maxWidth: 500,
+    minWidth: 500,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
@@ -41,10 +47,11 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  ipcMain.handle('dispatch', (_event, args) => {
-    //event.sender.send('text-sent', [...args])
-    const config = args[0]
-    console.log(config)
+  ipcMain.handle('dispatch', (event, args) => {
+    const { text, bucket, sortBy, amount, previousContact } = args[0]
+
+    console.log(args[0])
+    if(!text || !bucket || !sortBy || !amount || !previousContact) return event.sender.send('error', ['Please ensure all data is filled.'])
 
   })
   // Set app user model id for windows

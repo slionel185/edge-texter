@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { useTextStore } from '@/data/TextStore'
 import Dispatch from '@/components/forms/Dispatch'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function Index() {
     const location = useLocation()
@@ -32,9 +32,6 @@ export default function Index() {
                             <CardContent>
                                 <Dispatch />
                             </CardContent>
-                            <CardFooter>
-                                <Button>Test</Button>
-                            </CardFooter>
                         </Card>
                     </div>
                     <div className='w-full h-full flex flex-col gap-2 p-4 overflow-hidden border-t lg:border-t-0 lg:border-l' id='sendArray'>

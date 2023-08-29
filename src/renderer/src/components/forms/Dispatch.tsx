@@ -6,14 +6,18 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Form, FormField, FormItem } from '@/components/ui/form'
-import { Select, SelectItem, SelectContent, SelectGroup, SelectTrigger } from '@/components/ui/select'
-import { SelectValue } from '@radix-ui/react-select'
+import { Select, SelectItem, SelectContent, SelectGroup, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useTextStore } from '@/data/TextStore'
+import { useUserStore } from '@/data/UserStore'
 
 export default function Dispatch() {
+    const { active, setActive } = useTextStore()
+    const { user } = useUserStore()
     const form = useForm<DispatchFormType>()
 
     function onSubmit(values: DispatchFormType) {
-        window.electron.ipcRenderer.invoke('dispatch', [{ ...values }])
+        window.electron.ipcRenderer.invoke('dispatch', [{ ...values, ...user }])
+        setActive(true)
     }
     
     return (
@@ -78,7 +82,7 @@ export default function Dispatch() {
                         </FormItem>
                     )} />
 
-                    <Button type='submit' className='w-full mt-2'>Start</Button>
+                    <Button type='submit' className='w-full mt-2' disabled={active}>{active? 'Loading' : 'Start'}</Button>
                 </div>
             </form>
         </Form>

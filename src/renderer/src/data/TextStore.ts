@@ -7,6 +7,8 @@ interface Text {
 }
 
 interface TextStore {
+    active: boolean,
+    setActive: (status: boolean) => void,
     texts: Text[],
     addText: (text: Text) => void,
     clearTexts: () => void
@@ -15,12 +17,17 @@ interface TextStore {
 export const useTextStore = create<TextStore>()(
     persist(
         (set) => ({
+            active: false,
+            setActive: (status) => set(() => ({ active: status })),
             texts: [],
             addText: (text) => set((state) => ({ texts: [...state.texts, text] })),
             clearTexts: () => set(() => ({ texts: [] }))
         }),
         {
-            name: 'TextStorage'
+            name: 'TextStorage',
+            partialize: (state) => ({
+                texts: state.texts
+            })
         }
     )
 )

@@ -10,6 +10,7 @@ import TextListener from '@/components/listeners/TextListener'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { Toaster } from '@/components/ui/toaster'
 import ErrorListener from '@/components/listeners/ErrorListener'
+import EventListener from './components/listeners/EventListener'
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
             <Toaster />
             <TextListener />
             <ErrorListener />
+            <EventListener />
         </ThemeProvider>
     </StrictMode>
 )

@@ -3,6 +3,10 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
+import puppeteer from 'puppeteer'
+import sleep from './helpers/sleep'
+import { Circle } from 'lucide-react';
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -15,6 +19,7 @@ function createWindow(): void {
     minHeight: 760,
     maxWidth: 500,
     minWidth: 500,
+    title: 'The Edge - Text Blaster',
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
@@ -47,12 +52,84 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  ipcMain.handle('dispatch', (event, args) => {
-    const { text, bucket, sortBy, amount, previousContact } = args[0]
+  ipcMain.handle('dispatch', async (event, args) => {
+    event.sender.send('event', ['active'])
+    const { text, bucket, sortBy, amount, previousContact, username, password } = args[0]
 
-    console.log(args[0])
-    if(!text || !bucket || !sortBy || !amount || !previousContact) return event.sender.send('error', ['Please ensure all data is filled.'])
+    if(!text || !bucket || !sortBy || !amount || !previousContact || !username || !password) return event.sender.send('error', ['Please ensure all data is filled.'])
 
+    const browser = await puppeteer.launch({ headless: false, userDataDir: './tmp' })
+    const page = await browser.newPage()
+    await page.goto('https://app.club-os.com/action/Login/view')
+    await page.setViewport({
+      height: 1080,
+      width: 1920
+    })
+
+    const usernameField = await page.$('input[name=username]')
+    const passwordField = await page.$('input[name=password]')
+    const loginButton = await page.$('button.js-login')
+
+    await usernameField?.type(username)
+    await passwordField?.type(password)
+    await loginButton?.click()
+    await sleep(3000)
+
+    await page.goto('https://app.club-os.com/action/UserSearch')
+    await sleep(3000)
+
+    const noneBtn = await page.$('a#select-none')
+    const memberBtn = await page.$('input#client-icon')
+    const prospectBtn = await page.$('input#client-icon')
+    await noneBtn?.click()
+
+    if(bucket === 'WEB_LEAD') {
+      await prospectBtn?.click()
+      await page.select('select[name=filter.memberSalesFollowUpStatus]', '11')
+    } else if(bucket === 'VIP_GEUST') {
+      await prospectBtn?.click()
+      await page.select('select[name=filter.memberSalesFollowUpStatus]', '10')
+    } else if(bucket === 'PAID_PASS') {
+      await prospectBtn?.click()
+      await page.select('select[name=filter.memberSalesFollowUpStatus]', '20')
+    } else if(bucket === 'MISSED_GUEST') {
+      await prospectBtn?.click()
+      await page.select('select[name=filter.memberSalesFollowUpStatus]', '3')
+    } else if(bucket === 'APPT_NO_SHOW') {
+      await prospectBtn?.click()
+      await page.select('select[name=filter.memberSalesFollowUpStatus]', '12')
+    } else if(bucket === 'EXPIRED_GUEST') {
+      await prospectBtn?.click()
+      await page.select('select[name=filter.memberSalesFollowUpStatus]', '5')
+    } else if(bucket === 'GUEST_OF_TOTAL') {
+      await prospectBtn?.click()
+      await page.select('select[name=filter.memberSalesFollowUpStatus]', '9')
+    } else if(bucket === 'CANCELLED') {
+      await memberBtn?.click()
+      await page.select('select[name=filter.memberSalesFollowUpStatus]', '15')
+    } else if(bucket === 'COLLECTIONS') {
+      await memberBtn?.click()
+      await page.select('select[name=filter.memberSalesFollowUpStatus]', '16')
+    }
+
+    if(sortBy === 'DEFAULT') {
+      await page.select('select[name="filter.sort"]', 'roleId asc,firstName asc,lastName asc')
+    } else if(sortBy === 'CREATED_ASCENDING') {
+        await page.select('select[name="filter.sort"]', 'createdDate asc')
+    } else if(sortBy === 'CREATED_DESCENDING') {
+        await page.select('select[name="filter.sort"]', 'createdDate desc')
+    }
+
+    sleep(1500)
+
+    let amnt = Number(amount)
+    while(amnt > 0) {
+      event.sender.send('text-sent', ['Seth Torrence', bucket])
+      amnt--
+      await sleep(1000)
+    }
+    await browser.close()
+    event.sender.send('event', ['notActive'])
   })
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')

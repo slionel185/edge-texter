@@ -83,34 +83,38 @@ app.whenReady().then(() => {
     const prospectBtn = await page.$('input#client-icon')
     await noneBtn?.click()
 
+    await sleep(1500)
+
     if(bucket === 'WEB_LEAD') {
       await prospectBtn?.click()
-      await page.select('select[name=filter.memberSalesFollowUpStatus]', '11')
+      await page.select("select[name='filter.memberSalesFollowUpStatus']", '11')
     } else if(bucket === 'VIP_GEUST') {
       await prospectBtn?.click()
-      await page.select('select[name=filter.memberSalesFollowUpStatus]', '10')
+      await page.select("select[name='filter.memberSalesFollowUpStatus']", '10')
     } else if(bucket === 'PAID_PASS') {
       await prospectBtn?.click()
-      await page.select('select[name=filter.memberSalesFollowUpStatus]', '20')
+      await page.select("select[name='filter.memberSalesFollowUpStatus']", '20')
     } else if(bucket === 'MISSED_GUEST') {
       await prospectBtn?.click()
-      await page.select('select[name=filter.memberSalesFollowUpStatus]', '3')
+      await page.select("select[name='filter.memberSalesFollowUpStatus']", '3')
     } else if(bucket === 'APPT_NO_SHOW') {
       await prospectBtn?.click()
-      await page.select('select[name=filter.memberSalesFollowUpStatus]', '12')
+      await page.select("select[name='filter.memberSalesFollowUpStatus']", '12')
     } else if(bucket === 'EXPIRED_GUEST') {
       await prospectBtn?.click()
-      await page.select('select[name=filter.memberSalesFollowUpStatus]', '5')
+      await page.select("select[name='filter.memberSalesFollowUpStatus']", '5')
     } else if(bucket === 'GUEST_OF_TOTAL') {
       await prospectBtn?.click()
-      await page.select('select[name=filter.memberSalesFollowUpStatus]', '9')
+      await page.select("select[name='filter.memberSalesFollowUpStatus']", '9')
     } else if(bucket === 'CANCELLED') {
       await memberBtn?.click()
-      await page.select('select[name=filter.memberSalesFollowUpStatus]', '15')
+      await page.select("select[name='filter.memberSalesFollowUpStatus']", '15')
     } else if(bucket === 'COLLECTIONS') {
       await memberBtn?.click()
-      await page.select('select[name=filter.memberSalesFollowUpStatus]', '16')
+      await page.select("select[name='filter.memberSalesFollowUpStatus']", '16')
     }
+
+    await sleep(1500)
 
     if(sortBy === 'DEFAULT') {
       await page.select('select[name="filter.sort"]', 'roleId asc,firstName asc,lastName asc')
@@ -120,11 +124,12 @@ app.whenReady().then(() => {
         await page.select('select[name="filter.sort"]', 'createdDate desc')
     }
 
-    sleep(1500)
+    await sleep(1500)
 
     let amnt = Number(amount)
     while(amnt > 0) {
-      event.sender.send('text-sent', ['Seth Torrence', bucket])
+      
+
       amnt--
       await sleep(1000)
     }
